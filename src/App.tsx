@@ -1,5 +1,5 @@
 import Navbar from './components/Navbar';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 function App() {
@@ -8,8 +8,27 @@ function App() {
 
   const [todos, setTodos] = useState([]);
 
-  const handleEdit = () => {
-    
+    useEffect(() => {
+      let todoString = localStorage.getItem("todos");
+      if(todoString){
+     let todos = JSON.parse(localStorage.getItem("todos"));
+      setTodos(todos);
+      }
+    },[])
+  
+  const saveToLocalStorage = () => {
+locolStroage.setItem(todos,JSON.stringify(todos));
+}
+  const handleEdit = (event, id) => {
+   let todo = todos.filter((event) => {
+     return event.id === id;
+   })
+    setTodo(todo[0].todo);
+    let newTodos = todos.filter((item) => {
+     return item.id !== id;
+    });
+    setTodos(newTodos);
+    saveToLocalStorage()
   }
 
   const handleDelete = (event,id) => {
@@ -17,12 +36,14 @@ function App() {
      return item.id !== id;
     });
     setTodos(newTodos);
+    saveToLocalStorage()
   }
 
   const handleAdd = () => {
     setTodos([...todos, 
 {id:uuidv4(),todo,iscompleted:false}])
     setTodo("");
+    saveToLocalStorage()
   }
 
   const handleChange = (event) => {
@@ -37,6 +58,7 @@ function App() {
     let newTodos = [...todos];
     newTodos[index].iscompleted = !newTodos[index].iscompleted;
     setTodos(newTodos);
+    saveToLocalStorage()
   }
 
   return (
@@ -59,8 +81,8 @@ function App() {
        <input onChange={handleCheckbox} type="checkbox" value={props.isCompleted} name={props.id}/>
       <div className={props.isCompleted?"line-through":""}> {props.todo} </div>
         </div>
-      <div className="buttons"> 
-      <button onClick={handleEdit} className="bg-purple-500 hover:bg-purple-900 px-3 text-white rounded-lg mx-1"> edit </button>
+      <div className="buttons flex h-full"> 
+      <button onClick={(event)=>handleEdit(event,props.id)} className="bg-purple-500 hover:bg-purple-900 px-3 text-white rounded-lg mx-1"> edit </button>
       <button onClick={(event)=>handleDelete(event,props.id)} className="bg-purple-500 hover:bg-purple-900 px-3 text-white rounded-lg mx-1"> delete </button>
       </div>
       </div>
