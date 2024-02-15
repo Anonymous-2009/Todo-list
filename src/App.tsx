@@ -1,8 +1,9 @@
 import Navbar from './components/Navbar';
 import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 function App() {
-
+  
   const [todo, setTodo] = useState("");
 
   const [todos, setTodos] = useState([]);
@@ -11,13 +12,16 @@ function App() {
     
   }
 
-  const handleDelete = () => {
-    
+  const handleDelete = (event,id) => {
+    let newTodos = todos.filter((item) => {
+     return item.id !== id;
+    });
+    setTodos(newTodos);
   }
 
   const handleAdd = () => {
     setTodos([...todos, 
-    {todo,iscompleted:false}]);
+{id:uuidv4(),todo,iscompleted:false}])
     setTodo("");
   }
 
@@ -25,6 +29,16 @@ function App() {
     setTodo(event.target.value);
   }
   
+  const handleCheckbox = (event) => {
+  let id = event.target.name 
+  let index = todos.findIndex((item) => {
+     return item.id === id;
+   })
+    let newTodos = [...todos];
+    newTodos[index].iscompleted = !newTodos[index].iscompleted;
+    setTodos(newTodos);
+  }
+
   return (
     <>
       <Navbar />
@@ -36,15 +50,18 @@ function App() {
         </div>
       <h1 className="text-lg font-bold"> your todo </h1>
       <div className="todos">
+        {todos.length === 0 && <div>   no todo to display </div>}
         {
        todos.map((props) => {
         return  (
-      <div className="todo flex w-1/4 justify-between my-3">
-        <input type="checkbox"/>
-      <div className={props.iscompleted?"":"line-through"}> {props.todo} </div>
+      <div key={props.id} className="todo flex w-1/4 justify-between my-3">
+        <div className="flex gap-5">
+       <input onChange={handleCheckbox} type="checkbox" value={props.isCompleted} name={props.id}/>
+      <div className={props.isCompleted?"line-through":""}> {props.todo} </div>
+        </div>
       <div className="buttons"> 
       <button onClick={handleEdit} className="bg-purple-500 hover:bg-purple-900 px-3 text-white rounded-lg mx-1"> edit </button>
-      <button onClick={handleDelete} className="bg-purple-500 hover:bg-purple-900 px-3 text-white rounded-lg mx-1"> delete </button>
+      <button onClick={(event)=>handleDelete(event,props.id)} className="bg-purple-500 hover:bg-purple-900 px-3 text-white rounded-lg mx-1"> delete </button>
       </div>
       </div>
           )
